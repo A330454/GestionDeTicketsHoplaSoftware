@@ -47,7 +47,7 @@ Este comando descargará todas las dependencias que el proyecto necesita, es imp
 
 Se requiere tener 3 terminales activas para el funcionamiento correcto de este proyecto, esto para levantar el servicio de redis, de celery y de Django para su trabajo en conjunto.
 
-Una vez actives tu venv realiza las migraciones de la base de datos.
+Primero que nada, una vez actives tu venv realiza las migraciones de la base de datos.
 ```bash
     python manage.py makemigrations
     python manage.py migrate
