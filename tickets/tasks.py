@@ -1,11 +1,22 @@
 from celery import shared_task
-import requests
-from .models import Image
+import cloudinary.uploader
+from .models import Image, Ticket
 
 @shared_task
-def upload_image_to_storage(image_id):
+def upload_image_to_cloudinary(image_id, image_file):
     image = Image.objects.get(id=image_id)
-    # Aquí iría la lógica para subir la imagen a Cloudinary
-    # response = requests.post('URL_CLOUDINARY', data={'file': image.image_url})
-    # image.image_url = response.json()['secure_url']
-    # image.save()
+    try:
+        upload_result = cloudinary.uploader.upload(image_file)
+        image.image_url = upload_result['secure_url']
+        image.status = 'completed'
+        image.save()
+
+        # Verifica si todas las imágenes del ticket están completadas
+        ticket = image.ticket
+        if ticket.images.filter(status='completed').count() >= ticket.num_images:
+            ticket.status = 'completed'
+            ticket.save()
+    except Exception as e:
+        image.status = 'error'
+        image.save()
+        raise e

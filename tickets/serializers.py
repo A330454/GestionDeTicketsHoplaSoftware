@@ -9,4 +9,4 @@ class TicketSerializer(serializers.ModelSerializer):
 class ImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Image
-        fields = ['id', 'ticket', 'image_url', 'uploaded_at']
+        fields = ['id', 'ticket', 'image_url', 'uploaded_at', 'status']

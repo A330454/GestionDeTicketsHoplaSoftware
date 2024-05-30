@@ -9,5 +9,6 @@ class Ticket(models.Model):
 
 class Image(models.Model):
     ticket = models.ForeignKey(Ticket, related_name='images', on_delete=models.CASCADE)
-    image_url = models.URLField()
+    image_url = models.URLField(blank=True, null=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=20, choices=[('pending', 'Pending'), ('completed', 'Completed')])

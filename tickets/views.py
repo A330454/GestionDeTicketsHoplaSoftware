@@ -3,7 +3,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .models import Ticket, Image
 from .serializers import TicketSerializer, ImageSerializer
-from .tasks import upload_image_to_storage
+from .tasks import upload_image_to_cloudinary
+from django.db.models import Count
 
 class CreateTicketView(generics.CreateAPIView):
     queryset = Ticket.objects.all()
@@ -26,12 +27,10 @@ class UploadImageView(generics.CreateAPIView):
             return Response({"error": "Ticket is already completed"}, status=status.HTTP_400_BAD_REQUEST)
 
         response = super().create(request, *args, **kwargs)
+        image = Image.objects.get(id=response.data['id'])
 
-        if ticket.images.count() >= ticket.num_images:
-            ticket.status = 'completed'
-            ticket.save()
-
-        upload_image_to_storage.delay(response.data['id'])
+        # Llama a la tarea de Celery para subir la imagen a Cloudinary
+        upload_image_to_cloudinary.delay(image.id, request.data.get('image_file'))
 
         return response
 
