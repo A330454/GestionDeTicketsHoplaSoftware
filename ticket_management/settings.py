@@ -34,6 +34,7 @@ CELERY_RESULT_BACKEND = 'django-db'
 
 INSTALLED_APPS = [
     'tickets',
+    'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
