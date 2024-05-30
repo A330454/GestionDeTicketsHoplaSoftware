@@ -86,10 +86,21 @@ WSGI_APPLICATION = 'ticket_management.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': config('DATABASE_ENGINE'),
+#         'NAME': BASE_DIR / config('DATABASE_NAME'),
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': config('DATABASE_ENGINE'),
-        'NAME': BASE_DIR / config('DATABASE_NAME'),
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'hoplasoftwaPosgreSQL',
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
