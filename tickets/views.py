@@ -6,6 +6,7 @@ from .serializers import TicketSerializer, ImageSerializer
 from .tasks import upload_image_to_cloudinary
 from django.db.models import Count
 import logging
+from rest_framework.pagination import PageNumberPagination
 
 logger = logging.getLogger(__name__)
 
@@ -13,14 +14,15 @@ logger = logging.getLogger(__name__)
 class CreateTicketView(generics.CreateAPIView):
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
 class TicketListView(generics.ListAPIView):
     serializer_class = TicketSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
+    pagination_class = PageNumberPagination
 
     def get_queryset(self):
         user = self.request.user
