@@ -7,6 +7,7 @@ from .tasks import upload_image_to_cloudinary
 from django.db.models import Count
 import logging
 from rest_framework.pagination import PageNumberPagination
+from django.utils.dateparse import parse_date
 
 logger = logging.getLogger(__name__)
 
@@ -27,15 +28,26 @@ class TicketListView(generics.ListAPIView):
     def get_queryset(self):
         user = self.request.user
         queryset = Ticket.objects.filter(user=user)
+        
+        # Obtener parámetros de consulta
         status = self.request.query_params.get('status')
         start_date = self.request.query_params.get('start_date')
         end_date = self.request.query_params.get('end_date')
 
+        # Filtrar por estado si se proporciona
         if status:
             queryset = queryset.filter(status=status)
-        if start_date and end_date:
-            queryset = queryset.filter(created_at__range=[start_date, end_date])
-
+        
+        # Filtrar por rango de fechas si se proporciona
+        if start_date:
+            start_date = parse_date(start_date)
+            if start_date:
+                queryset = queryset.filter(created_at__gte=start_date)
+        if end_date:
+            end_date = parse_date(end_date)
+            if end_date:
+                queryset = queryset.filter(created_at__lte=end_date)
+        
         return queryset
 
 class TicketDetailView(generics.RetrieveAPIView):
