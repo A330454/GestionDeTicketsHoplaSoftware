@@ -5,6 +5,10 @@ from .models import Ticket, Image
 from .serializers import TicketSerializer, ImageSerializer
 from .tasks import upload_image_to_cloudinary
 from django.db.models import Count
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class CreateTicketView(generics.CreateAPIView):
     queryset = Ticket.objects.all()
@@ -13,26 +17,6 @@ class CreateTicketView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-
-class UploadImageView(generics.CreateAPIView):
-    queryset = Image.objects.all()
-    serializer_class = ImageSerializer
-    permission_classes = [IsAuthenticated]
-
-    def create(self, request, *args, **kwargs):
-        ticket_id = request.data.get('ticket')
-        ticket = Ticket.objects.get(id=ticket_id)
-
-        if ticket.status == 'completed':
-            return Response({"error": "Ticket is already completed"}, status=status.HTTP_400_BAD_REQUEST)
-
-        response = super().create(request, *args, **kwargs)
-        image = Image.objects.get(id=response.data['id'])
-
-        # Llama a la tarea de Celery para subir la imagen a Cloudinary
-        upload_image_to_cloudinary.delay(image.id, request.data.get('image_file'))
-
-        return response
 
 class TicketListView(generics.ListAPIView):
     serializer_class = TicketSerializer
@@ -69,3 +53,28 @@ class ImageDetailView(generics.RetrieveAPIView):
     def get_queryset(self):
         user = self.request.user
         return Image.objects.filter(ticket__user=user)
+    
+class UploadImageView(generics.CreateAPIView):
+    queryset = Image.objects.all()
+    serializer_class = ImageSerializer
+    permission_classes = [IsAuthenticated]
+
+    def create(self, request, *args, **kwargs):
+        logger.info(f"Received request to upload image with data: {request.data}")
+        ticket_id = request.data.get('ticket')
+        image_url = request.data.get('image_url')
+        ticket = Ticket.objects.get(id=ticket_id)
+
+        if ticket.status == 'completed':
+            return Response({"error": "Ticket is already completed"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Crear la imagen con estado pendiente
+        image = Image.objects.create(ticket=ticket, image_url=image_url, status='pending')
+
+        # Llama a la tarea de Celery para subir la imagen a Cloudinary
+        logger.info("Sending Information to upload_image_to_cloudinary with ID: {image.id}")
+        upload_image_to_cloudinary(image.id)
+        logger.info(f"Dispatched Celery task for image ID {image.id}")
+
+        serializer = self.get_serializer(image)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)

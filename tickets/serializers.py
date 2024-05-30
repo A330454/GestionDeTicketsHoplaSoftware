@@ -10,3 +10,4 @@ class ImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Image
         fields = ['id', 'ticket', 'image_url', 'uploaded_at', 'status']
+        read_only_fields = ['status']  # Hacer que status sea de solo lectura
