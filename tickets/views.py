@@ -1,4 +1,4 @@
-from rest_framework import generics, status
+from rest_framework import generics, status, permissions
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .models import Ticket, Image
@@ -60,3 +60,12 @@ class TicketDetailView(generics.RetrieveAPIView):
     def get_queryset(self):
         user = self.request.user
         return Ticket.objects.filter(user=user)
+
+class ImageDetailView(generics.RetrieveAPIView):
+    queryset = Image.objects.all()
+    serializer_class = ImageSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        return Image.objects.filter(ticket__user=user)
