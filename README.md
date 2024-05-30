@@ -1,4 +1,4 @@
-# 🌟 Gestión De Tickets Hoplasoftware
+# Gestión De Tickets Hoplasoftware
 
 📝 Este proyecto es una api rest que nos permita gestionar los tickets de creación de transacciones en una aplicación de subida de fotos.
 
