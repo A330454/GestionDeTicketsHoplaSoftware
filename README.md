@@ -2,6 +2,27 @@
 
 Este proyecto es una api rest que nos permita gestionar los tickets de creación de transacciones en una aplicación de subida de fotos.
 
+## Endpoints
+Esto es una breve introducción a los endpoints que encontrarás en este proyecto. Podrás encontrar más información una ves ejecutes el proyecto en http://127.0.0.1:8000/swagger/ (generación de documentación automática con Swagger)
+
+- **Create Ticket**: http://127.0.0.1:8000/api/tickets/create/
+
+
+Payload: {"num_images": 3, "status":"pending"}
+- **Upload Image**: http://127.0.0.1:8000/api/tickets/upload/
+
+
+Payload: {"ticket": 1, "image_url": "https://t4.ftcdn.net/jpg/01/43/23/83/360_F_143238306_lh0ap42wgot36y44WybfQpvsJB5A1CHc.jpg"}
+
+  Nota: el campo ticket en el payload es el ID de el ticket existente
+- **List Tickets**: http://127.0.0.1:8000/api/tickets/upload/](http://127.0.0.1:8000/api/tickets/list/
+- **List Tickets por status**: http://127.0.0.1:8000/api/tickets/list/?status=completed
+- **List Tickets por dia**: http://127.0.0.1:8000/api/tickets/list/?start_date=2024-05-29&end_date=2024-05-31
+- **List Tickets por dia y por status**: http://127.0.0.1:8000/api/tickets/list/?start_date=2024-05-29&end_date=2024-05-31&status=pending
+- **List Tickets por dia y por status**: http://127.0.0.1:8000/api/tickets/detail/{id}
+- **Image Detail**: http://127.0.0.1:8000/api/tickets/image/{id}
+
+
 ## 📋 Requisitos Previos
 
 - **Python** 🐍: Asegúrate de tener Python 3.11.5 o superior instalado.
