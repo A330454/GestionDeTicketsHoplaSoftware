@@ -63,7 +63,14 @@ class UploadImageView(generics.CreateAPIView):
         logger.info(f"Received request to upload image with data: {request.data}")
         ticket_id = request.data.get('ticket')
         image_url = request.data.get('image_url')
-        ticket = Ticket.objects.get(id=ticket_id)
+        
+        try:
+            ticket = Ticket.objects.get(id=ticket_id)
+        except Ticket.DoesNotExist:
+            return Response({"error": "Ticket does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        
+        if ticket.images.count() >= ticket.num_images:
+            return Response({"error": "Ticket already has the maximum number of images"}, status=status.HTTP_400_BAD_REQUEST)
 
         if ticket.status == 'completed':
             return Response({"error": "Ticket is already completed"}, status=status.HTTP_400_BAD_REQUEST)
@@ -72,7 +79,7 @@ class UploadImageView(generics.CreateAPIView):
         image = Image.objects.create(ticket=ticket, image_url=image_url, status='pending')
 
         # Llama a la tarea de Celery para subir la imagen a Cloudinary
-        logger.info("Sending Information to upload_image_to_cloudinary with ID: {image.id}")
+        logger.info(f"Sending Information to upload_image_to_cloudinary with ID: {image.id}")
         upload_image_to_cloudinary(image.id)
         logger.info(f"Dispatched Celery task for image ID {image.id}")
 

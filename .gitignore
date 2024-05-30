@@ -1,0 +1,16 @@
+# .gitignore
+
+# Python
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+
+# Environments
+.env
+
+# Django
+*.log
+db.sqlite3
+/static/
+media/
